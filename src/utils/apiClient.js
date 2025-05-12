@@ -13,7 +13,7 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
-    if(token){
+    if (token) {
       console.log(token);
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -63,11 +63,21 @@ export const loginUserDataFlower = async (username, password) => {
   }
 };
 
-export const addTickets = async(projectName, description, userId, userName) => {
-try {
+export const addTickets = async (projectName, description, userId, userName,
+  priority,
+  status,
+  date,
+  category) => {
+  try {
     const registerResponse = await apiClient.post(
       "/ticket/8d19971e-8e16-4360-8f58-b9c3016cdeb9",
-      { projectName, description, userId, userName }
+      {
+        projectName, description, userId, userName,
+        priority,
+        status,
+        date,
+        category
+      }
     );
     console.log("Ticket registered:", registerResponse);
     return registerResponse;
@@ -79,7 +89,12 @@ try {
 export const getSpecificTickets = async () => {
   try {
     const getTickets = await apiClient.get(
-      "/ticket/8d19971e-8e16-4360-8f58-b9c3016cdeb9"
+      "/ticket/8d19971e-8e16-4360-8f58-b9c3016cdeb9",
+      {
+        params: {
+          limit: 10000
+        }
+      }
     );
     console.log("Ticket got:", getTickets);
     return getTickets;
@@ -88,7 +103,11 @@ export const getSpecificTickets = async () => {
   }
 }
 
-export const addTicketWithImage = async (projectName, description, userId, userName, attachment) => {
+export const addTicketWithImage = async (projectName, description, userId, userName, attachment,
+  priority,
+  status,
+  date,
+  category) => {
   try {
     const response = await apiClient.post(
       "/ticket/8d19971e-8e16-4360-8f58-b9c3016cdeb9",
@@ -97,7 +116,11 @@ export const addTicketWithImage = async (projectName, description, userId, userN
         description,
         userId,
         userName,
-        attachment: null  
+        attachment: null,
+        priority,
+        status,
+        date,
+        category
       }
     );
 
@@ -113,7 +136,7 @@ export const addTicketWithImage = async (projectName, description, userId, userN
             'Content-Type': 'multipart/form-data',
           },
           params: {
-            fieldName: 'attachment'  
+            fieldName: 'attachment'
           }
         }
       );
@@ -137,8 +160,8 @@ export const logOut = () => {
   localStorage.removeItem('userName');
 }
 
-export const addProject = async(projectName) => {
-try {
+export const addProject = async (projectName) => {
+  try {
     const registerResponse = await apiClient.post(
       "/odysseprojects/076cfe09-95d0-4c63-86cd-7eb193460efe",
       { projectName }
@@ -153,7 +176,12 @@ try {
 export const getProjects = async () => {
   try {
     const registerResponse = await apiClient.get(
-      "/odysseprojects/076cfe09-95d0-4c63-86cd-7eb193460efe"
+      "/odysseprojects/076cfe09-95d0-4c63-86cd-7eb193460efe",
+      {
+        params: {
+          limit: 10000
+        }
+      }
     );
     console.log("Project got:", registerResponse);
     return registerResponse;
@@ -174,16 +202,38 @@ export const deleteTicket = async (ticketId) => {
   }
 }
 
-export const updateTicket = async (ticketId, description, projectName) => {
+export const updateTicket = async (ticketId, description, projectName, priority, status, date, category) => {
   try {
-    const registerResponse = await apiClient.put(
+    const response = await apiClient.put(
       `/ticket/8d19971e-8e16-4360-8f58-b9c3016cdeb9/dataId/${ticketId}`,
       {
         description,
-        projectName
+        projectName,
+        priority,
+        status,
+        date,
+        category
       }
     );
-    console.log("Ticket deleted:", registerResponse);
+    console.log("Ticket updated:", response);
+    return response;
+  } catch (error) {
+    console.error("Error updating ticket:", error);
+    throw error; // Re-throw so we can handle it in the component
+  }
+}
+
+export const getAllUsers = async () => {
+  try {
+    const registerResponse = await apiClient.get(
+      "/users/cfe3b457-4b1d-40c2-a4bf-9dc053050e4c",
+      {
+        params: {
+          limit: 10000
+        }
+      }
+    );
+    console.log("Project got:", registerResponse);
     return registerResponse;
   } catch (error) {
     console.error("Error", error);

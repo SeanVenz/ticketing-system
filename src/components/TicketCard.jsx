@@ -6,13 +6,26 @@ const TicketCard = ({ ticket, onUpdate }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editDescription, setEditDescription] = useState(ticket.description);
   const [editProjectName, setEditProjectName] = useState(ticket.projectName);
+  const [editPriority, setEditPriority] = useState(ticket.priority || "Medium");
+  const [editStatus, setEditStatus] = useState(ticket.status || "Open");
+  const [editDate, setEditDate] = useState(ticket.date || "");
+  const [editCategory, setEditCategory] = useState(ticket.category || "Bug");
   const [isUpdating, setIsUpdating] = useState(false);
   const { projects, loading: projectsLoading } = useGetAllProjects();
 
   const handleUpdate = async () => {
     setIsUpdating(true);
     try {
-      const response = await updateTicket(ticket.id, editDescription, editProjectName);
+      const response = await updateTicket(
+        ticket.id, 
+        editDescription, 
+        editProjectName,
+        editPriority,
+        editStatus,
+        editDate,
+        editCategory
+      );
+      
       if (response?.data?.success) {
         setIsModalOpen(false);
         // Notify parent component to refresh data
@@ -35,6 +48,27 @@ const TicketCard = ({ ticket, onUpdate }) => {
     }
   };
 
+  // Get priority badge color
+  const getPriorityBadgeColor = (priority) => {
+    switch(priority) {
+      case 'Low': return 'bg-blue-100 text-blue-800';
+      case 'Medium': return 'bg-yellow-100 text-yellow-800';
+      case 'High': return 'bg-orange-100 text-orange-800';
+      case 'Urgent': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  // Get status badge color
+  const getStatusBadgeColor = (status) => {
+    switch(status) {
+      case 'Open': return 'bg-green-100 text-green-800';
+      case 'In Progress': return 'bg-blue-100 text-blue-800';
+      case 'Closed': return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
     <>
       {/* Card */}
@@ -45,6 +79,20 @@ const TicketCard = ({ ticket, onUpdate }) => {
         {/* Project Header */}
         <div className="bg-blue-600 p-4 text-white">
           <h3 className="font-bold text-lg truncate">{ticket.projectName}</h3>
+          
+          {/* Status and Priority Badges */}
+          <div className="flex space-x-2 mt-2">
+            {ticket.status && (
+              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(ticket.status)}`}>
+                {ticket.status}
+              </span>
+            )}
+            {ticket.priority && (
+              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityBadgeColor(ticket.priority)}`}>
+                {ticket.priority}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Card Body */}
@@ -65,6 +113,20 @@ const TicketCard = ({ ticket, onUpdate }) => {
               />
             </div>
           )}
+
+          {/* Additional Info */}
+          <div className="text-sm text-gray-600 mb-3">
+            {ticket.category && (
+              <div className="mb-1">
+                <span className="font-medium">Category:</span> {ticket.category}
+              </div>
+            )}
+            {ticket.date && (
+              <div>
+                <span className="font-medium">Due Date:</span> {new Date(ticket.date).toLocaleDateString()}
+              </div>
+            )}
+          </div>
 
           {/* Card Footer */}
           <div className="flex justify-between items-center mt-4 text-xs text-gray-500">
@@ -116,6 +178,68 @@ const TicketCard = ({ ticket, onUpdate }) => {
                 onChange={(e) => setEditDescription(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 rows="4"
+              />
+            </div>
+
+            {/* Priority */}
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Priority
+              </label>
+              <select
+                value={editPriority}
+                onChange={(e) => setEditPriority(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+                <option value="Urgent">Urgent</option>
+              </select>
+            </div>
+
+            {/* Status */}
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Status
+              </label>
+              <select
+                value={editStatus}
+                onChange={(e) => setEditStatus(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="Open">Open</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Closed">Closed</option>
+              </select>
+            </div>
+
+            {/* Category */}
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Category
+              </label>
+              <select
+                value={editCategory}
+                onChange={(e) => setEditCategory(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="Bug">Bug</option>
+                <option value="Feature Request">Feature Request</option>
+                <option value="Support">Support</option>
+              </select>
+            </div>
+
+            {/* Due Date */}
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Target Due Date
+              </label>
+              <input
+                type="date"
+                value={editDate}
+                onChange={(e) => setEditDate(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
