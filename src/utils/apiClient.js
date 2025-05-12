@@ -161,3 +161,31 @@ export const getProjects = async () => {
     console.error("Error", error);
   }
 }
+
+export const deleteTicket = async (ticketId) => {
+  try {
+    const registerResponse = await apiClient.delete(
+      `/ticket/8d19971e-8e16-4360-8f58-b9c3016cdeb9/dataId/${ticketId}`
+    );
+    console.log("Ticket deleted:", registerResponse);
+    return registerResponse;
+  } catch (error) {
+    console.error("Error", error);
+  }
+}
+
+export const updateTicket = async (ticketId, description, projectName) => {
+  try {
+    const registerResponse = await apiClient.put(
+      `/ticket/8d19971e-8e16-4360-8f58-b9c3016cdeb9/dataId/${ticketId}`,
+      {
+        description,
+        projectName
+      }
+    );
+    console.log("Ticket deleted:", registerResponse);
+    return registerResponse;
+  } catch (error) {
+    console.error("Error", error);
+  }
+}

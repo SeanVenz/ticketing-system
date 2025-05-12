@@ -1,8 +1,9 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { addTickets, addTicketWithImage } from '../utils/apiClient'
 import { useGetSpecificTickets } from '../hooks/useGetSpecificTickets';
 import Navbar from '../components/Navbar';
 import { useGetAllProjects } from '../hooks/useGetAllProjects';
+import TicketCard from '../components/TicketCard';
 
 function Dashboard() {
     const [projectName, setProjectName] = useState('');
@@ -10,9 +11,29 @@ function Dashboard() {
     const [attachment, setAttachment] = useState(null);
     const [fileName, setFileName] = useState('');
     const [isUploading, setIsUploading] = useState(false);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
     const fileInputRef = useRef(null);
-    const {tickets, loading, error} = useGetSpecificTickets();
+    
+    const {tickets, loading, error, refetch} = useGetSpecificTickets();
     const {projects, loading: projectsLoading, error: projectsError} = useGetAllProjects();
+
+    // Function to refresh tickets after update/delete
+    const handleTicketUpdate = () => {
+        // Trigger refetch of tickets
+        if (refetch) {
+            refetch();
+        } else {
+            // Fallback if refetch isn't available
+            setRefreshTrigger(prev => prev + 1);
+        }
+    };
+
+    // Effect to refetch tickets when refreshTrigger changes
+    useEffect(() => {
+        if (refreshTrigger > 0) {
+            window.location.reload();
+        }
+    }, [refreshTrigger]);
 
     // Handle file selection
     const handleFileChange = (e) => {
@@ -42,7 +63,6 @@ function Dashboard() {
             
             let response;
             if (attachment) {
-                // Use the function with image upload
                 response = await addTicketWithImage(
                     projectName, 
                     description, 
@@ -51,7 +71,6 @@ function Dashboard() {
                     attachment
                 );
             } else {
-                // Use the regular function without image
                 response = await addTickets(
                     projectName, 
                     description, 
@@ -64,8 +83,7 @@ function Dashboard() {
                 setProjectName('');
                 setProjectDescription('');
                 clearFileInput();
-                // Reload tickets to show the new one
-                window.location.reload();
+                handleTicketUpdate();
             }
         } catch (error) {
             console.error("Error adding ticket:", error);
@@ -77,26 +95,27 @@ function Dashboard() {
   return (
     <>
     <Navbar/>
-    <div className="">
+    <div className="container mx-auto px-4 py-6">
         
-        <h1>Dashboard</h1>
+        <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
         
-        <div className="ticket-form">
-            <h2>Add New Ticket</h2>
+        {/* Add Ticket Form */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 className="text-xl font-semibold mb-4">Add New Ticket</h2>
             <form onSubmit={addTicket}>
-                <div className="form-group">
-                    <label htmlFor="projectName">Project</label>
+                <div className="mb-4">
+                    <label htmlFor="projectName" className="block text-gray-700 font-medium mb-2">Project</label>
                     {projectsLoading ? (
                         <p>Loading projects...</p>
                     ) : projectsError ? (
-                        <p>Error loading projects: {projectsError}</p>
+                        <p className="text-red-500">Error loading projects: {projectsError}</p>
                     ) : (
                         <select
                             id="projectName"
                             value={projectName}
                             onChange={(e) => setProjectName(e.target.value)}
                             required
-                            className="project-select"
+                            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">Select a project</option>
                             {projects && projects.map((project) => (
@@ -108,33 +127,42 @@ function Dashboard() {
                     )}
                 </div>
                 
-                <div className="form-group">
-                    <label htmlFor="description">Description</label>
+                <div className="mb-4">
+                    <label htmlFor="description" className="block text-gray-700 font-medium mb-2">Description</label>
                     <textarea 
                         id="description"
                         value={description} 
                         onChange={(e) => setProjectDescription(e.target.value)}
                         placeholder="Enter description" 
                         required
+                        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        rows="3"
                     />
                 </div>
                 
-                <div className="form-group">
-                    <label htmlFor="attachment">Attachment (Optional)</label>
-                    <div className="file-input-container">
+                <div className="mb-6">
+                    <label htmlFor="attachment" className="block text-gray-700 font-medium mb-2">Attachment (Optional)</label>
+                    <div className="flex items-center">
                         <input 
                             id="attachment"
                             type="file" 
                             onChange={handleFileChange}
                             ref={fileInputRef}
+                            className="hidden"
                         />
+                        <label 
+                            htmlFor="attachment" 
+                            className="cursor-pointer bg-gray-200 hover:bg-gray-300 py-2 px-4 rounded"
+                        >
+                            Choose File
+                        </label>
                         {fileName && (
-                            <div className="file-name">
-                                <span>{fileName}</span>
+                            <div className="ml-3 flex items-center">
+                                <span className="text-sm text-gray-600">{fileName}</span>
                                 <button 
                                     type="button" 
                                     onClick={clearFileInput} 
-                                    className="clear-file"
+                                    className="ml-2 text-red-500 hover:text-red-700"
                                 >
                                     ✕
                                 </button>
@@ -146,46 +174,30 @@ function Dashboard() {
                 <button 
                     type="submit" 
                     disabled={isUploading || !projectName}
-                    className="submit-button"
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded disabled:bg-blue-300"
                 >
                     {isUploading ? 'Creating Ticket...' : 'Create Ticket'}
                 </button>
             </form>
         </div>
 
-        <div className="tickets-list">
-            <h2>Your Tickets</h2>
+        {/* Tickets List */}
+        <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4">Your Tickets</h2>
             {loading ? (
-                <p>Loading tickets...</p>
+                <p className="text-gray-500">Loading tickets...</p>
             ) : error ? (
-                <p>Error: {error}</p>
+                <p className="text-red-500">Error: {error}</p>
             ) : tickets.length === 0 ? (
-                <p>No tickets found</p>
+                <p className="text-gray-500">No tickets found</p>
             ) : (
-                <div className="tickets-grid">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {tickets.map((ticket) => (
-                        <div key={ticket.id} className="ticket-card">
-                            <h3>{ticket.projectName}</h3>
-                            <p className="description">{ticket.description}</p>
-                            <p className="ticket-id">ID: {ticket.id}</p>
-                            
-                            {/* Only display the image if file_url exists */}
-                            {ticket.file_url && ticket.file_metadata?.file_url?.url && (
-                                <div className="attachment">
-                                    <img 
-                                        src={`http://localhost:3000${ticket.file_metadata.file_url.url.replace('/undefined/', '/be9f9147-80e9-4ff0-b06f-8ae787edc6dc/')}`}
-                                        alt={`Attachment for ${ticket.projectName}`}
-                                        className="ticket-image"
-                                        crossOrigin="anonymous" // Try adding this
-                                        onError={(e) => {
-                                            console.error("Image failed to load:", e.target.src);
-                                            e.target.style.display = 'none';
-                                            e.target.parentNode.innerHTML += "<p>Image failed to load</p>";
-                                        }}
-                                    />
-                                </div>
-                            )}
-                        </div>
+                        <TicketCard 
+                            key={ticket.id} 
+                            ticket={ticket} 
+                            onUpdate={handleTicketUpdate}
+                        />
                     ))}
                 </div>
             )}
