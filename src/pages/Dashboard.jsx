@@ -6,6 +6,7 @@ import TicketCard from "../components/TicketCard";
 import TicketModal from "../components/TicketModal";
 import Button from "../components/Button";
 import StatusFilterTab from "../components/StatusFilterTab";
+import AddTicket from "../components/AddTicket";
 
 function Dashboard() {
   const [isAddTicketModalOpen, setIsAddTicketModalOpen] = useState(false);
@@ -15,6 +16,17 @@ function Dashboard() {
 
   // Handle ticket update/refresh
   const handleTicketUpdate = () => {
+    if (refetch) {
+      refetch();
+    }
+  };
+
+  // Add this handler for newly added tickets
+  const handleTicketAdded = () => {
+    // Close the modal
+    setIsAddTicketModalOpen(false);
+    
+    // Refresh the tickets list
     if (refetch) {
       refetch();
     }
@@ -139,9 +151,9 @@ function Dashboard() {
 
       {/* Add Ticket Modal */}
       {isAddTicketModalOpen && (
-        <TicketModal
+        <AddTicket
+          onTicketAdded={handleTicketAdded}
           onClose={() => setIsAddTicketModalOpen(false)}
-          onTicketAdded={handleTicketUpdate}
         />
       )}
     </>
