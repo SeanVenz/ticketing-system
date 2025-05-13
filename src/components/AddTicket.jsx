@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { addTickets, addTicketWithImage } from "../utils/apiClient";
 import { useGetAllProjects } from "../hooks/useGetAllProjects";
 import Button from "./Button";
+import ConfirmationModal from "./ConfirmationModal";
 
 function AddTicket({ onTicketAdded, onClose }) {
   const [projectName, setProjectName] = useState("");
@@ -14,6 +15,12 @@ function AddTicket({ onTicketAdded, onClose }) {
   const [fileName, setFileName] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
+
+  const [showAddConfirmationModal, setShowAddConfirmationModal] = useState(false);
+
+  const openConfirmation = () => {
+    setShowAddConfirmationModal(true);
+  }
 
   const {
     projects,
@@ -41,13 +48,20 @@ function AddTicket({ onTicketAdded, onClose }) {
 
   // Handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    // If called from a form submit event, prevent default behavior
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
+    
+    // Close the confirmation modal
+    setShowAddConfirmationModal(false);
+    
     setIsUploading(true);
-
+  
     try {
       const userId = localStorage.getItem("userId");
       const userName = localStorage.getItem("userName");
-
+  
       let response;
       if (attachment) {
         response = await addTicketWithImage(
@@ -73,7 +87,7 @@ function AddTicket({ onTicketAdded, onClose }) {
           category
         );
       }
-
+  
       if (response?.data?.success === true) {
         // Reset form
         setProjectName("");
@@ -115,7 +129,7 @@ function AddTicket({ onTicketAdded, onClose }) {
           </button>
         </div>
         
-        <form onSubmit={handleSubmit}>
+        <div>
           <div className="mb-4">
             <label
               htmlFor="projectName"
@@ -258,7 +272,7 @@ function AddTicket({ onTicketAdded, onClose }) {
                 id="category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                required
+                requi red
                 className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="Bug">Bug</option>
@@ -293,15 +307,27 @@ function AddTicket({ onTicketAdded, onClose }) {
               Cancel
             </Button>
             <Button
-              types="submit"
+              // types="submit"
               disabled={isUploading || !projectName}
+              onClick={() => openConfirmation()}
               type="primary"
             >
               {isUploading ? "Creating Ticket..." : "Create Ticket"}
             </Button>
           </div>
-        </form>
+        </div>
       </div>
+      <ConfirmationModal
+        isOpen={showAddConfirmationModal}
+        onClose={() => setShowAddConfirmationModal(false)}
+        onConfirm={handleSubmit}
+        title="Create Ticket"
+        message="Are you sure you want to create this ticket?"
+        confirmText="Create"
+        cancelText="Cancel"
+        confirmType="primary"
+        isLoading={isUploading}
+      />
     </div>
   );
 }
