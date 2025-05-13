@@ -4,6 +4,7 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
   return (
@@ -12,9 +13,13 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/admin" element={<Admin />} />
 
+        {/* Private Routes */}
+        <Route element={<PrivateRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin" element={<Admin />} />
+        </Route>
+        
         {/* 404 route - keep this last */}
         {/* <Route path="*" element={<NotFound />} /> */}
       </Routes>

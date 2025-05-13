@@ -158,6 +158,7 @@ export const addTicketWithImage = async (projectName, description, userId, userN
 export const logOut = () => {
   localStorage.removeItem('userId');
   localStorage.removeItem('userName');
+  localStorage.removeItem('token');
 }
 
 export const addProject = async (projectName) => {
