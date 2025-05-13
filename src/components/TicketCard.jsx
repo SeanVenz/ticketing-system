@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { updateTicket, deleteTicket } from "../utils/apiClient";
 import { useGetAllProjects } from "../hooks/useGetAllProjects";
 import Button from "./Button";
+import ConfirmationModal from "./ConfirmationModal";
 
 const TicketCard = ({ ticket, onUpdate }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,12 +14,24 @@ const TicketCard = ({ ticket, onUpdate }) => {
   const [editCategory, setEditCategory] = useState(ticket.category || "Bug");
   const [editDevComment, setEditDevComment] = useState(ticket.devComment || "");
   const [isUpdating, setIsUpdating] = useState(false);
+  
+  // New state for confirmation modals
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [showSaveConfirmation, setShowSaveConfirmation] = useState(false);
+  
   const { projects, loading: projectsLoading } = useGetAllProjects();
 
   const userid = localStorage.getItem("userId");
 
+  // Handle update ticket with confirmation
+  const confirmUpdate = () => {
+    setShowSaveConfirmation(true);
+  };
+
   const handleUpdate = async () => {
     setIsUpdating(true);
+    setShowSaveConfirmation(false);
+    
     try {
       const response = await updateTicket(
         ticket.id,
@@ -42,12 +55,23 @@ const TicketCard = ({ ticket, onUpdate }) => {
     }
   };
 
+  // Handle delete ticket with confirmation
+  const confirmDelete = () => {
+    setShowDeleteConfirmation(true);
+  };
+
   const handleDelete = async () => {
+    setIsUpdating(true);
+    setShowDeleteConfirmation(false);
+    
     try {
       await deleteTicket(ticket.id);
+      setIsModalOpen(false);
       if (onUpdate) onUpdate();
     } catch (error) {
       console.error("Error deleting ticket:", error);
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -345,7 +369,7 @@ const TicketCard = ({ ticket, onUpdate }) => {
               {/* Action Buttons */}
               <div className="flex justify-between mt-6">
                 <div>
-                  <Button types="button" onClick={handleDelete} type="tertiary">
+                  <Button types="button" onClick={confirmDelete} type="tertiary">
                     Delete
                   </Button>
                 </div>
@@ -361,7 +385,8 @@ const TicketCard = ({ ticket, onUpdate }) => {
                   <Button
                     types="button"
                     type="primary"
-                    onClick={handleUpdate}
+                    onClick={confirmUpdate}
+                    disabled={isUpdating}
                   >
                     {isUpdating ? "Saving..." : "Save Changes"}
                   </Button>
@@ -371,6 +396,32 @@ const TicketCard = ({ ticket, onUpdate }) => {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showDeleteConfirmation}
+        onClose={() => setShowDeleteConfirmation(false)}
+        onConfirm={handleDelete}
+        title="Delete Ticket"
+        message={`Are you sure you want to delete the ticket "${ticket.projectName}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        confirmType="tertiary"
+        isLoading={isUpdating}
+      />
+
+      {/* Save Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showSaveConfirmation}
+        onClose={() => setShowSaveConfirmation(false)}
+        onConfirm={handleUpdate}
+        title="Save Changes"
+        message="Are you sure you want to save these changes to the ticket?"
+        confirmText="Save"
+        cancelText="Cancel"
+        confirmType="primary"
+        isLoading={isUpdating}
+      />
     </>
   );
 };
