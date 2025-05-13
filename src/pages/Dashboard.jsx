@@ -14,6 +14,8 @@ function Dashboard() {
   const [statusFilter, setStatusFilter] = useState("all");
   const { tickets, loading, error, refetch } = useGetSpecificTickets();
 
+  const userName = localStorage.getItem('userName');
+
   // Handle ticket update/refresh
   const handleTicketUpdate = () => {
     if (refetch) {
@@ -43,6 +45,7 @@ function Dashboard() {
       <div className="container mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Dashboard</h1>
+          <span>Welcome {userName}</span>
           <Button
             onClick={() => setIsAddTicketModalOpen(true)}
             types="button"
