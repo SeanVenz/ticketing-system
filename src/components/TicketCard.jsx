@@ -3,6 +3,7 @@ import { updateTicket, deleteTicket } from "../utils/apiClient";
 import { useGetAllProjects } from "../hooks/useGetAllProjects";
 
 const TicketCard = ({ ticket, onUpdate }) => {
+  // Existing state declarations and handlers remain the same
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editDescription, setEditDescription] = useState(ticket.description);
   const [editProjectName, setEditProjectName] = useState(ticket.projectName);
@@ -16,7 +17,9 @@ const TicketCard = ({ ticket, onUpdate }) => {
 
   const userid = localStorage.getItem("userId");
 
+  // Keep your existing handlers
   const handleUpdate = async () => {
+    // Your existing update code
     setIsUpdating(true);
     try {
       const response = await updateTicket(
@@ -43,6 +46,7 @@ const TicketCard = ({ ticket, onUpdate }) => {
   };
 
   const handleDelete = async () => {
+    // Your existing delete code
     try {
       await deleteTicket(ticket.id);
       // Notify parent component to refresh data
@@ -52,7 +56,7 @@ const TicketCard = ({ ticket, onUpdate }) => {
     }
   };
 
-  // Get priority badge color
+  // Your existing color helper functions
   const getPriorityBadgeColor = (priority) => {
     switch (priority) {
       case "Low":
@@ -68,7 +72,6 @@ const TicketCard = ({ ticket, onUpdate }) => {
     }
   };
 
-  // Get status badge color
   const getStatusBadgeColor = (status) => {
     switch (status) {
       case "Open":
@@ -79,6 +82,13 @@ const TicketCard = ({ ticket, onUpdate }) => {
         return "bg-gray-100 text-gray-800";
       default:
         return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  // Handle backdrop click
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      setIsModalOpen(false);
     }
   };
 
@@ -161,190 +171,196 @@ const TicketCard = ({ ticket, onUpdate }) => {
         </div>
       </div>
 
-      {/* Edit Modal */}
+      {/* Updated Edit Modal Design - Matching AddTicket Modal */}
       {isModalOpen && (
-        <div
-          className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50"
-          onClick={() => setIsModalOpen(false)}
+        <div 
+          className="fixed inset-0 z-50 overflow-y-auto"
+          onClick={handleBackdropClick}
         >
-          <div
-            className="bg-white rounded-lg p-6 w-full max-w-lg mx-4 shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 className="text-xl font-bold mb-4">Edit Ticket</h2>
-
-            {/* Project Name Dropdown */}
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Project
-              </label>
-              {projectsLoading ? (
-                <p>Loading projects...</p>
-              ) : (
-                <select
-                  value={editProjectName}
-                  onChange={(e) => setEditProjectName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          {/* Backdrop */}
+          <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center" />
+          
+          {/* Modal content */}
+          <div className="flex items-center justify-center min-h-screen p-4">
+            <div 
+              className="bg-white rounded-lg p-6 w-full max-w-2xl shadow-xl relative z-10 max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">Edit Ticket</h2>
+                <button 
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="text-gray-500 hover:text-gray-700"
                 >
-                  {projects &&
-                    projects.map((project) => (
-                      <option key={project.id} value={project.projectName}>
-                        {project.projectName}
-                      </option>
-                    ))}
-                </select>
-              )}
-            </div>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
 
-            {/* Description */}
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Description
-              </label>
-              <textarea
-                value={editDescription}
-                onChange={(e) => setEditDescription(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows="4"
-              />
-            </div>
-
-            {/* Priority */}
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Priority
-              </label>
-              <select
-                value={editPriority}
-                onChange={(e) => setEditPriority(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-                <option value="Urgent">Urgent</option>
-              </select>
-            </div>
-
-            {/* Status */}
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Status
-              </label>
-              <select
-                value={editStatus}
-                onChange={(e) => setEditStatus(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="Open">Open</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Closed">Closed</option>
-              </select>
-            </div>
-
-            {/* Category */}
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Category
-              </label>
-              <select
-                value={editCategory}
-                onChange={(e) => setEditCategory(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="Bug">Bug</option>
-                <option value="Feature Request">Feature Request</option>
-                <option value="Support">Support</option>
-              </select>
-            </div>
-
-            {/* Due Date */}
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                Target Due Date
-              </label>
-              <input
-                type="date"
-                value={editDate}
-                onChange={(e) => setEditDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            {/* Display image if exists */}
-            {ticket.file_url && ticket.file_metadata?.file_url?.url && (
+              {/* Project Name Dropdown */}
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                  Attachment
+                <label className="block text-gray-700 font-medium mb-2">
+                  Project
                 </label>
-                <img
-                  src={`http://localhost:3000${ticket.file_metadata.file_url.url.replace(
-                    "/undefined/",
-                    "/be9f9147-80e9-4ff0-b06f-8ae787edc6dc/"
-                  )}`}
-                  alt={`Attachment for ${ticket.projectName}`}
-                  className="w-full max-h-60 object-contain rounded-md"
-                  crossOrigin="anonymous"
+                {projectsLoading ? (
+                  <p>Loading projects...</p>
+                ) : (
+                  <select
+                    value={editProjectName}
+                    onChange={(e) => setEditProjectName(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {projects &&
+                      projects.map((project) => (
+                        <option key={project.id} value={project.projectName}>
+                          {project.projectName}
+                        </option>
+                      ))}
+                  </select>
+                )}
+              </div>
+
+              {/* Description */}
+              <div className="mb-4">
+                <label className="block text-gray-700 font-medium mb-2">
+                  Description
+                </label>
+                <textarea
+                  value={editDescription}
+                  onChange={(e) => setEditDescription(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows="3"
                 />
               </div>
-            )}
 
-            {userid === "eafe4269-72c2-489d-8739-db7e522b7900" ? (
-              <>
+              {/* Two columns for fields */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Priority */}
                 <div className="mb-4">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">
-                    Developer comment
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Priority
                   </label>
-                  <textarea
-                    value={editDevComment}
-                    onChange={(e) => setEditDevComment(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows="4"
+                  <select
+                    value={editPriority}
+                    onChange={(e) => setEditPriority(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Urgent">Urgent</option>
+                  </select>
+                </div>
+
+                {/* Status */}
+                <div className="mb-4">
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Status
+                  </label>
+                  <select
+                    value={editStatus}
+                    onChange={(e) => setEditStatus(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Closed">Closed</option>
+                  </select>
+                </div>
+
+                {/* Category */}
+                <div className="mb-4">
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Category
+                  </label>
+                  <select
+                    value={editCategory}
+                    onChange={(e) => setEditCategory(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="Bug">Bug</option>
+                    <option value="Feature Request">Feature Request</option>
+                    <option value="Support">Support</option>
+                  </select>
+                </div>
+
+                {/* Due Date */}
+                <div className="mb-4">
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Target Due Date
+                  </label>
+                  <input
+                    type="date"
+                    value={editDate}
+                    onChange={(e) => setEditDate(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-              </>
-            ) : (
-              <>
-                <div className="mb-4">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">
-                    Developer comment
-                  </label>
-                  <textarea
-                    value={editDescription}
-                    onChange={(e) => setEditDescription(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows="4"
-                    readOnly
-                  />
-                </div>
-              </>
-            )}
-
-            {/* Action Buttons */}
-            <div className="flex justify-between mt-6">
-              <div>
-                <button
-                  onClick={handleDelete}
-                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 mr-2"
-                >
-                  Delete
-                </button>
               </div>
 
-              <div>
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 mr-2"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleUpdate}
-                  disabled={isUpdating}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
-                >
-                  {isUpdating ? "Saving..." : "Save Changes"}
-                </button>
+              {/* Display image if exists */}
+              {ticket.file_url && ticket.file_metadata?.file_url?.url && (
+                <div className="mb-4">
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Attachment
+                  </label>
+                  <img
+                    src={`http://localhost:3000${ticket.file_metadata.file_url.url.replace(
+                      "/undefined/",
+                      "/be9f9147-80e9-4ff0-b06f-8ae787edc6dc/"
+                    )}`}
+                    alt={`Attachment for ${ticket.projectName}`}
+                    className="w-full max-h-60 object-contain rounded-md"
+                    crossOrigin="anonymous"
+                  />
+                </div>
+              )}
+
+              {/* Developer comment */}
+              <div className="mb-4">
+                <label className="block text-gray-700 font-medium mb-2">
+                  Developer comment
+                </label>
+                <textarea
+                  value={userid === "eafe4269-72c2-489d-8739-db7e522b7900" ? editDevComment : ticket.devComment || ""}
+                  onChange={(e) => setEditDevComment(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows="3"
+                  readOnly={userid !== "eafe4269-72c2-489d-8739-db7e522b7900"}
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-between mt-6">
+                <div>
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 mr-2"
+                  >
+                    Delete
+                  </button>
+                </div>
+
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 mr-2"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleUpdate}
+                    disabled={isUpdating}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
+                  >
+                    {isUpdating ? "Saving..." : "Save Changes"}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
