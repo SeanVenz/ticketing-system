@@ -4,7 +4,6 @@ import { useGetAllProjects } from "../hooks/useGetAllProjects";
 import Button from "./Button";
 
 const TicketCard = ({ ticket, onUpdate }) => {
-  // Existing state declarations and handlers remain the same
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editDescription, setEditDescription] = useState(ticket.description);
   const [editProjectName, setEditProjectName] = useState(ticket.projectName);
@@ -18,9 +17,7 @@ const TicketCard = ({ ticket, onUpdate }) => {
 
   const userid = localStorage.getItem("userId");
 
-  // Keep your existing handlers
   const handleUpdate = async () => {
-    // Your existing update code
     setIsUpdating(true);
     try {
       const response = await updateTicket(
@@ -36,7 +33,6 @@ const TicketCard = ({ ticket, onUpdate }) => {
 
       if (response?.data?.success) {
         setIsModalOpen(false);
-        // Notify parent component to refresh data
         if (onUpdate) onUpdate();
       }
     } catch (error) {
@@ -47,17 +43,14 @@ const TicketCard = ({ ticket, onUpdate }) => {
   };
 
   const handleDelete = async () => {
-    // Your existing delete code
     try {
       await deleteTicket(ticket.id);
-      // Notify parent component to refresh data
       if (onUpdate) onUpdate();
     } catch (error) {
       console.error("Error deleting ticket:", error);
     }
   };
 
-  // Your existing color helper functions
   const getPriorityBadgeColor = (priority) => {
     switch (priority) {
       case "Low":
@@ -101,8 +94,8 @@ const TicketCard = ({ ticket, onUpdate }) => {
         onClick={() => setIsModalOpen(true)}
       >
         {/* Project Header */}
-        <div className="bg-blue-600 p-4 text-white">
-          <h3 className="font-bold text-lg truncate">{ticket.projectName}</h3>
+        <div className={` p-4  ${getPriorityBadgeColor(ticket.priority)} text-black`}>
+          <h3 className="font-bold text-lg truncate text-black">{ticket.projectName}</h3>
 
           {/* Status and Priority Badges */}
           <div className="flex space-x-2 mt-2">
@@ -192,7 +185,7 @@ const TicketCard = ({ ticket, onUpdate }) => {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-gray-500 cursor-pointer hover:text-gray-700"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

@@ -1,34 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useGetSpecificTickets } from "../hooks/useGetSpecificTickets";
+import { getFilteredTickets, ticketCount } from "../utils/utils";
 import Navbar from "../components/Navbar";
 import TicketCard from "../components/TicketCard";
-import AddTicket from "../components/AddTicket";
+import TicketModal from "../components/TicketModal";
 import Button from "../components/Button";
+import StatusFilterTab from "../components/StatusFilterTab";
 
 function Dashboard() {
   const [isAddTicketModalOpen, setIsAddTicketModalOpen] = useState(false);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-
+  // Add status filter state
+  const [statusFilter, setStatusFilter] = useState("all");
   const { tickets, loading, error, refetch } = useGetSpecificTickets();
 
-  // Function to refresh tickets after update/delete
+  // Handle ticket update/refresh
   const handleTicketUpdate = () => {
-    // Trigger refetch of tickets
     if (refetch) {
       refetch();
-    } else {
-      // Fallback if refetch isn't available
-      setRefreshTrigger((prev) => prev + 1);
     }
   };
 
-  // Effect to refetch tickets when refreshTrigger changes
-  useEffect(() => {
-    if (refreshTrigger > 0) {
-      window.location.reload();
-    }
-  }, [refreshTrigger]);
+  const filteredTickets = getFilteredTickets(tickets, statusFilter);
 
+  const openTicketsCount = ticketCount(tickets, "Open");
+  const inProgressTicketsCount = ticketCount(tickets, "In Progress");
+  const closedTicketsCount = ticketCount(tickets, "Closed");
   return (
     <>
       <Navbar />
@@ -37,7 +33,8 @@ function Dashboard() {
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <Button
             onClick={() => setIsAddTicketModalOpen(true)}
-            type={"primary"}
+            types="button"
+            type="primary"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -55,7 +52,7 @@ function Dashboard() {
           </Button>
         </div>
 
-        {/* Ticket Statistics */}
+        {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <div className="bg-blue-100 p-4 rounded-lg shadow">
             <h3 className="text-lg font-medium text-blue-800 mb-2">
@@ -87,26 +84,48 @@ function Dashboard() {
           </div>
         </div>
 
+        {/* Status Filter Tabs */}
+        <StatusFilterTab
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+          openTicketsCount={openTicketsCount}
+          inProgressTicketsCount={inProgressTicketsCount}
+          closedTicketsCount={closedTicketsCount}
+        />
+
         {/* Tickets List */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Your Tickets</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            {statusFilter === "open"
+              ? "Open Tickets"
+              : statusFilter === "inProgress"
+              ? "In Progress Tickets"
+              : statusFilter === "closed"
+              ? "Closed Tickets"
+              : "All Tickets"}
+          </h2>
           {loading ? (
             <p className="text-gray-500">Loading tickets...</p>
           ) : error ? (
             <p className="text-red-500">Error: {error}</p>
-          ) : tickets.length === 0 ? (
+          ) : filteredTickets.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-500 mb-4">No tickets found</p>
-              <button
-                onClick={() => setIsAddTicketModalOpen(true)}
-                className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded"
-              >
+              <p className="text-gray-500 mb-4">
+                {statusFilter === "all"
+                  ? "No tickets found"
+                  : `No ${
+                      statusFilter === "inProgress"
+                        ? "in-progress"
+                        : statusFilter
+                    } tickets found`}
+              </p>
+              <Button onClick={() => setIsAddTicketModalOpen(true)}>
                 Create Your First Ticket
-              </button>
+              </Button>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {tickets.map((ticket) => (
+              {filteredTickets.map((ticket) => (
                 <TicketCard
                   key={ticket.id}
                   ticket={ticket}
@@ -120,7 +139,7 @@ function Dashboard() {
 
       {/* Add Ticket Modal */}
       {isAddTicketModalOpen && (
-        <AddTicket
+        <TicketModal
           onClose={() => setIsAddTicketModalOpen(false)}
           onTicketAdded={handleTicketUpdate}
         />
