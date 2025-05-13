@@ -1,30 +1,14 @@
-import React, { useState, useRef, useEffect } from "react";
-import { addTickets, addTicketWithImage } from "../utils/apiClient";
+import React, { useState, useEffect } from "react";
 import { useGetSpecificTickets } from "../hooks/useGetSpecificTickets";
 import Navbar from "../components/Navbar";
-import { useGetAllProjects } from "../hooks/useGetAllProjects";
 import TicketCard from "../components/TicketCard";
+import AddTicket from "../components/AddTicket";
 
 function Dashboard() {
-  const [projectName, setProjectName] = useState("");
-  const [description, setProjectDescription] = useState("");
-  const [attachment, setAttachment] = useState(null);
-  const [priority, setPriority] = useState("");
-  const [status, setStatus] = useState("");
-  const [date, setDate] = useState("");
-  const [category, setCategory] = useState("");
-
-  const [fileName, setFileName] = useState("");
-  const [isUploading, setIsUploading] = useState(false);
+  const [isAddTicketModalOpen, setIsAddTicketModalOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const fileInputRef = useRef(null);
-
+  
   const { tickets, loading, error, refetch } = useGetSpecificTickets();
-  const {
-    projects,
-    loading: projectsLoading,
-    error: projectsError,
-  } = useGetAllProjects();
 
   // Function to refresh tickets after update/delete
   const handleTicketUpdate = () => {
@@ -44,253 +28,43 @@ function Dashboard() {
     }
   }, [refreshTrigger]);
 
-  // Handle file selection
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      setAttachment(selectedFile);
-      setFileName(selectedFile.name);
-    }
-  };
-
-  // Clear the file input
-  const clearFileInput = () => {
-    setAttachment(null);
-    setFileName("");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
-  const addTicket = async (e) => {
-    e.preventDefault();
-    setIsUploading(true);
-
-    try {
-      const userId = localStorage.getItem("userId");
-      const userName = localStorage.getItem("userName");
-
-      let response;
-      if (attachment) {
-        response = await addTicketWithImage(
-          projectName,
-          description,
-          userId,
-          userName,
-          attachment,
-          priority,
-          status,
-          date,
-          category
-        );
-      } else {
-        response = await addTickets(
-          projectName,
-          description,
-          userId,
-          userName,
-          priority,
-          status,
-          date,
-          category
-        );
-      }
-
-      if (response?.data?.success === true) {
-        setProjectName("");
-        setProjectDescription("");
-        clearFileInput();
-        handleTicketUpdate();
-      }
-    } catch (error) {
-      console.error("Error adding ticket:", error);
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
   return (
     <>
       <Navbar />
       <div className="container mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <button
+            onClick={() => setIsAddTicketModalOpen(true)}
+            className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded flex items-center"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+            </svg>
+            Add Ticket
+          </button>
+        </div>
 
-        {/* Add Ticket Form */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">Add New Ticket</h2>
-          <form onSubmit={addTicket}>
-            <div className="mb-4">
-              <label
-                htmlFor="projectName"
-                className="block text-gray-700 font-medium mb-2"
-              >
-                Project
-              </label>
-              {projectsLoading ? (
-                <p>Loading projects...</p>
-              ) : projectsError ? (
-                <p className="text-red-500">
-                  Error loading projects: {projectsError}
-                </p>
-              ) : (
-                <select
-                  id="projectName"
-                  value={projectName}
-                  onChange={(e) => setProjectName(e.target.value)}
-                  required
-                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Select a project</option>
-                  {projects &&
-                    projects.map((project) => (
-                      <option key={project.id} value={project.projectName}>
-                        {project.projectName}
-                      </option>
-                    ))}
-                </select>
-              )}
-            </div>
-
-            <div className="mb-4">
-              <label
-                htmlFor="description"
-                className="block text-gray-700 font-medium mb-2"
-              >
-                Description
-              </label>
-              <textarea
-                id="description"
-                value={description}
-                onChange={(e) => setProjectDescription(e.target.value)}
-                placeholder="Enter description"
-                required
-                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows="3"
-              />
-            </div>
-
-            <div className="mb-6">
-              <label
-                htmlFor="attachment"
-                className="block text-gray-700 font-medium mb-2"
-              >
-                Attachment (Optional)
-              </label>
-              <div className="flex items-center">
-                <input
-                  id="attachment"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  ref={fileInputRef}
-                  className="hidden"
-                />
-                <label
-                  htmlFor="attachment"
-                  className="cursor-pointer bg-gray-200 hover:bg-gray-300 py-2 px-4 rounded"
-                >
-                  Choose File
-                </label>
-                {fileName && (
-                  <div className="ml-3 flex items-center">
-                    <span className="text-sm text-gray-600">{fileName}</span>
-                    <button
-                      type="button"
-                      onClick={clearFileInput}
-                      className="ml-2 text-red-500 hover:text-red-700"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="mb-4">
-              <label
-                htmlFor="priority"
-                className="block text-gray-700 font-medium mb-2"
-              >
-                Priority
-              </label>
-              <select
-                id="priority"
-                value={priority}
-                onChange={(e) => setPriority(e.target.value)}
-                required
-                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select priority</option>
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-                <option value="Urgent">Urgent</option>
-              </select>
-            </div>
-
-            <div className="mb-4">
-              <label
-                htmlFor="status"
-                className="block text-gray-700 font-medium mb-2"
-              >
-                Status
-              </label>
-              <select
-                id="status"
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                required
-                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="Open">Open</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Closed">Closed</option>
-              </select>
-            </div>
-
-            <div className="mb-4">
-              <label
-                htmlFor="category"
-                className="block text-gray-700 font-medium mb-2"
-              >
-                Category
-              </label>
-              <select
-                id="category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                required
-                className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="Bug">Bug</option>
-                <option value="Feature Request">Feature Request</option>
-                <option value="Support">Support</option>
-              </select>
-            </div>
-
-            <div className="mb-4">
-              <label
-                htmlFor="date"
-                className="block text-gray-700 font-medium mb-2"
-              >
-                Target Due Date
-              </label>
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                name="date"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isUploading || !projectName}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded disabled:bg-blue-300"
-            >
-              {isUploading ? "Creating Ticket..." : "Create Ticket"}
-            </button>
-          </form>
+        {/* Ticket Statistics */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <div className="bg-blue-100 p-4 rounded-lg shadow">
+            <h3 className="text-lg font-medium text-blue-800 mb-2">Total Tickets</h3>
+            <p className="text-2xl font-bold text-blue-900">{tickets?.length || 0}</p>
+          </div>
+          
+          <div className="bg-green-100 p-4 rounded-lg shadow">
+            <h3 className="text-lg font-medium text-green-800 mb-2">Open Tickets</h3>
+            <p className="text-2xl font-bold text-green-900">
+              {tickets?.filter(ticket => ticket.status === "Open").length || 0}
+            </p>
+          </div>
+          
+          <div className="bg-purple-100 p-4 rounded-lg shadow">
+            <h3 className="text-lg font-medium text-purple-800 mb-2">In Progress</h3>
+            <p className="text-2xl font-bold text-purple-900">
+              {tickets?.filter(ticket => ticket.status === "In Progress").length || 0}
+            </p>
+          </div>
         </div>
 
         {/* Tickets List */}
@@ -301,7 +75,15 @@ function Dashboard() {
           ) : error ? (
             <p className="text-red-500">Error: {error}</p>
           ) : tickets.length === 0 ? (
-            <p className="text-gray-500">No tickets found</p>
+            <div className="text-center py-8">
+              <p className="text-gray-500 mb-4">No tickets found</p>
+              <button
+                onClick={() => setIsAddTicketModalOpen(true)}
+                className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded"
+              >
+                Create Your First Ticket
+              </button>
+            </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {tickets.map((ticket) => (
@@ -315,6 +97,14 @@ function Dashboard() {
           )}
         </div>
       </div>
+
+      {/* Add Ticket Modal */}
+      {isAddTicketModalOpen && (
+        <AddTicket 
+          onClose={() => setIsAddTicketModalOpen(false)} 
+          onTicketAdded={handleTicketUpdate} 
+        />
+      )}
     </>
   );
 }

@@ -203,7 +203,7 @@ export const deleteTicket = async (ticketId) => {
   }
 }
 
-export const updateTicket = async (ticketId, description, projectName, priority, status, date, category) => {
+export const updateTicket = async (ticketId, description, projectName, priority, status, date, category, devComment) => {
   try {
     const response = await apiClient.put(
       `/ticket/8d19971e-8e16-4360-8f58-b9c3016cdeb9/dataId/${ticketId}`,
@@ -213,7 +213,8 @@ export const updateTicket = async (ticketId, description, projectName, priority,
         priority,
         status,
         date,
-        category
+        category,
+        devComment
       }
     );
     console.log("Ticket updated:", response);
