@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { addTickets, addTicketWithImage } from "../utils/apiClient";
 import { useGetAllProjects } from "../hooks/useGetAllProjects";
+import Button from "./Button";
 
 function AddTicket({ onTicketAdded, onClose }) {
   const [projectName, setProjectName] = useState("");
@@ -106,7 +107,7 @@ function AddTicket({ onTicketAdded, onClose }) {
           <h2 className="text-xl font-semibold">Add New Ticket</h2>
           <button 
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-500 hover:text-gray-700 cursor-pointer"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -284,21 +285,20 @@ function AddTicket({ onTicketAdded, onClose }) {
             </div>
           </div>
 
-          <div className="flex justify-end mt-6">
-            <button
-              type="button"
+          <div className="flex justify-end mt-6 gap-2">
+            <Button
               onClick={onClose}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 mr-2"
+              type={"secondary"}
             >
               Cancel
-            </button>
-            <button
-              type="submit"
+            </Button>
+            <Button
+              types="submit"
               disabled={isUploading || !projectName}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded disabled:bg-blue-300"
+              type="primary"
             >
               {isUploading ? "Creating Ticket..." : "Create Ticket"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

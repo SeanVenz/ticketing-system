@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { updateTicket, deleteTicket } from "../utils/apiClient";
 import { useGetAllProjects } from "../hooks/useGetAllProjects";
+import Button from "./Button";
 
 const TicketCard = ({ ticket, onUpdate }) => {
   // Existing state declarations and handlers remain the same
@@ -173,28 +174,39 @@ const TicketCard = ({ ticket, onUpdate }) => {
 
       {/* Updated Edit Modal Design - Matching AddTicket Modal */}
       {isModalOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-50 overflow-y-auto"
           onClick={handleBackdropClick}
         >
           {/* Backdrop */}
           <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center" />
-          
+
           {/* Modal content */}
           <div className="flex items-center justify-center min-h-screen p-4">
-            <div 
+            <div
               className="bg-white rounded-lg p-6 w-full max-w-2xl shadow-xl relative z-10 max-h-[90vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">Edit Ticket</h2>
-                <button 
+                <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
                   className="text-gray-500 hover:text-gray-700"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -324,7 +336,11 @@ const TicketCard = ({ ticket, onUpdate }) => {
                   Developer comment
                 </label>
                 <textarea
-                  value={userid === "eafe4269-72c2-489d-8739-db7e522b7900" ? editDevComment : ticket.devComment || ""}
+                  value={
+                    userid === "eafe4269-72c2-489d-8739-db7e522b7900"
+                      ? editDevComment
+                      : ticket.devComment || ""
+                  }
                   onChange={(e) => setEditDevComment(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   rows="3"
@@ -335,31 +351,26 @@ const TicketCard = ({ ticket, onUpdate }) => {
               {/* Action Buttons */}
               <div className="flex justify-between mt-6">
                 <div>
-                  <button
-                    type="button"
-                    onClick={handleDelete}
-                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 mr-2"
-                  >
+                  <Button types="button" onClick={handleDelete} type="tertiary">
                     Delete
-                  </button>
+                  </Button>
                 </div>
 
-                <div>
-                  <button
-                    type="button"
+                <div className="flex flex-row gap-2">
+                  <Button
+                    types="button"
+                    type="secondary"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 mr-2"
                   >
                     Cancel
-                  </button>
-                  <button
-                    type="button"
+                  </Button>
+                  <Button
+                    types="button"
+                    type="primary"
                     onClick={handleUpdate}
-                    disabled={isUpdating}
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
                   >
                     {isUpdating ? "Saving..." : "Save Changes"}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
