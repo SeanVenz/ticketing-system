@@ -14,11 +14,13 @@ function Login() {
       console.log(reg.data.data.id);
       if (reg.data.data.id === "eafe4269-72c2-489d-8739-db7e522b7900") {
         localStorage.setItem("userId", "eafe4269-72c2-489d-8739-db7e522b7900");
+        localStorage.setItem("isAdmin", true);
         localStorage.setItem("token", reg.data.accessToken);
         return navigate("/admin");
       }
       localStorage.setItem("userId", reg.data.data.id);
       localStorage.setItem("userName", reg.data.data.username);
+      localStorage.setItem("isAdmin", false);
       localStorage.setItem("token", reg.data.accessToken);
 
       return navigate("/dashboard");

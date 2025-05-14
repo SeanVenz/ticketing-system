@@ -40,6 +40,11 @@ export const getFilteredTickets = (tickets, statusFilter) => {
                 (ticket) => ticket.status === "In Progress"
             );
             break;
+        case "forReview":
+            filteredTickets = tickets.filter(
+                (ticket) => ticket.status === "For Review"
+            );
+            break;
         case "closed":
             filteredTickets = tickets.filter(
                 (ticket) => ticket.status === "Closed"
@@ -49,10 +54,13 @@ export const getFilteredTickets = (tickets, statusFilter) => {
             filteredTickets = [...tickets];
     }
 
-    // Sort by priority (exclude closed tickets only in "all" view)
     return sortTicketsByPriority(filteredTickets, statusFilter === "all");
 };
 
 export const ticketCount = (tickets, status) => {
+    if (!tickets) return 0;
+    if(status === "For Review"){
+        console.log('here')
+    }
     return tickets?.filter(ticket => ticket.status === status).length || 0;
 }

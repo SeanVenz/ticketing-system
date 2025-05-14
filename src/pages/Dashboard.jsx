@@ -7,14 +7,16 @@ import TicketModal from "../components/TicketModal";
 import Button from "../components/Button";
 import StatusFilterTab from "../components/StatusFilterTab";
 import AddTicket from "../components/AddTicket";
+import TicketHeader from "../components/TicketHeader";
+import TicketParagraph from "../components/TicketParagraph";
 
 function Dashboard() {
   const [isAddTicketModalOpen, setIsAddTicketModalOpen] = useState(false);
-  // Add status filter state
+
   const [statusFilter, setStatusFilter] = useState("all");
   const { tickets, loading, error, refetch } = useGetSpecificTickets();
 
-  const userName = localStorage.getItem('userName');
+  // const userName = localStorage.getItem('userName');
 
   // Handle ticket update/refresh
   const handleTicketUpdate = () => {
@@ -23,9 +25,7 @@ function Dashboard() {
     }
   };
 
-  // Add this handler for newly added tickets
   const handleTicketAdded = () => {
-    // Close the modal
     setIsAddTicketModalOpen(false);
     
     // Refresh the tickets list
@@ -38,14 +38,15 @@ function Dashboard() {
 
   const openTicketsCount = ticketCount(tickets, "Open");
   const inProgressTicketsCount = ticketCount(tickets, "In Progress");
+  const forReviewTicketsCount = ticketCount(tickets, "For Review");
   const closedTicketsCount = ticketCount(tickets, "Closed");
+
   return (
     <>
       <Navbar />
       <div className="container mx-auto px-4 mt-14 py-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Dashboard</h1>
-          <span>Welcome {userName}</span>
           <Button
             onClick={() => setIsAddTicketModalOpen(true)}
             types="button"
@@ -105,35 +106,20 @@ function Dashboard() {
           setStatusFilter={setStatusFilter}
           openTicketsCount={openTicketsCount}
           inProgressTicketsCount={inProgressTicketsCount}
+          forReviewTicketsCount={forReviewTicketsCount}
           closedTicketsCount={closedTicketsCount}
         />
 
         {/* Tickets List */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">
-            {statusFilter === "open"
-              ? "Open Tickets"
-              : statusFilter === "inProgress"
-              ? "In Progress Tickets"
-              : statusFilter === "closed"
-              ? "Closed Tickets"
-              : "All Tickets"}
-          </h2>
+          <TicketHeader statusFilter={statusFilter}/>
           {loading ? (
             <p className="text-gray-500">Loading tickets...</p>
           ) : error ? (
             <p className="text-red-500">Error: {error}</p>
           ) : filteredTickets.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-500 mb-4">
-                {statusFilter === "all"
-                  ? "No tickets found"
-                  : `No ${
-                      statusFilter === "inProgress"
-                        ? "in-progress"
-                        : statusFilter
-                    } tickets found`}
-              </p>
+              <TicketParagraph statusFilter={statusFilter}/>
               <Button onClick={() => setIsAddTicketModalOpen(true)}>
                 Create Your First Ticket
               </Button>

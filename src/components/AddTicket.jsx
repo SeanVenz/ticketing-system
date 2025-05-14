@@ -257,6 +257,7 @@ function AddTicket({ onTicketAdded, onClose }) {
               >
                 <option value="Open">Open</option>
                 <option value="In Progress">In Progress</option>
+                <option value="For Review">For Review</option>
                 <option value="Closed">Closed</option>
               </select>
             </div>

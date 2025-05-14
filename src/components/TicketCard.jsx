@@ -21,7 +21,9 @@ const TicketCard = ({ ticket, onUpdate }) => {
   
   const { projects, loading: projectsLoading } = useGetAllProjects();
 
-  const userid = localStorage.getItem("userId");
+  // const userid = localStorage.getItem("userId");
+
+  const isAdmin = !!localStorage.getItem('isAdmin');
 
   // Handle update ticket with confirmation
   const confirmUpdate = () => {
@@ -295,6 +297,7 @@ const TicketCard = ({ ticket, onUpdate }) => {
                   >
                     <option value="Open">Open</option>
                     <option value="In Progress">In Progress</option>
+                    <option value="For Review">For Review</option>
                     <option value="Closed">Closed</option>
                   </select>
                 </div>
@@ -355,14 +358,14 @@ const TicketCard = ({ ticket, onUpdate }) => {
                 </label>
                 <textarea
                   value={
-                    userid === "eafe4269-72c2-489d-8739-db7e522b7900"
+                    isAdmin === true
                       ? editDevComment
                       : ticket.devComment || ""
                   }
                   onChange={(e) => setEditDevComment(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   rows="3"
-                  readOnly={userid !== "eafe4269-72c2-489d-8739-db7e522b7900"}
+                  readOnly={isAdmin !== true}
                 />
               </div>
 

@@ -6,22 +6,22 @@ function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   const isActive = (path) => location.pathname === path;
   const userName = localStorage.getItem("userName") || "User";
   const isAdmin = localStorage.getItem("isAdmin") === "true";
-  
+
   const handleLogout = () => {
     // Clear local storage
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     localStorage.removeItem("userName");
     localStorage.removeItem("isAdmin");
-    
+
     // Redirect to login
     navigate("/login");
   };
-  
+
   return (
     <nav className="bg-white border-b border-gray-200 fixed w-full z-30 top-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -29,55 +29,26 @@ function Navbar() {
           {/* Logo and Desktop Navigation */}
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link to="/dashboard">
-                {/* <img
-                  className="h-8 w-auto"
-                  src={Logo || "https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"}
-                  alt="Ticket App"
-                /> */}
-              </Link>
-              <span className="text-xl font-bold ml-2 text-gray-800">TicketApp</span>
+              <span className="text-xl font-bold ml-2 text-gray-800">
+                TicketApp
+              </span>
             </div>
-            
+
             {/* Desktop Navigation Links */}
             <div className="hidden sm:ml-6 sm:flex sm:items-center">
               <Link
                 to="/dashboard"
                 className={`px-3 py-2 rounded-md text-sm font-medium ${
-                  isActive("/dashboard")
+                  isActive("/dashboard") || isActive("/admin")
                     ? "text-blue-600"
                     : "text-gray-500 hover:text-blue-600 hover:bg-gray-50"
                 }`}
               >
                 Dashboard
               </Link>
-              
-              <Link
-                to="/projects"
-                className={`px-3 py-2 rounded-md text-sm font-medium ${
-                  isActive("/projects")
-                    ? "text-blue-600"
-                    : "text-gray-500 hover:text-blue-600 hover:bg-gray-50"
-                }`}
-              >
-                Projects
-              </Link>
-              
-              {isAdmin && (
-                <Link
-                  to="/admin"
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    isActive("/admin")
-                      ? "text-blue-600"
-                      : "text-gray-500 hover:text-blue-600 hover:bg-gray-50"
-                  }`}
-                >
-                  Admin
-                </Link>
-              )}
             </div>
           </div>
-          
+
           {/* User Account Menu */}
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
             <div className="ml-3 relative">
@@ -90,14 +61,14 @@ function Navbar() {
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="text-sm text-gray-500 hover:text-red-500"
+                  className="text-sm cursor-pointer text-gray-500 hover:text-red-500"
                 >
                   Logout
                 </button>
               </div>
             </div>
           </div>
-          
+
           {/* Mobile menu button */}
           <div className="flex items-center sm:hidden">
             <button
@@ -108,7 +79,7 @@ function Navbar() {
               <span className="sr-only">Open main menu</span>
               {/* Hamburger icon */}
               <svg
-                className={`${isMobileMenuOpen ? 'hidden' : 'block'} h-6 w-6`}
+                className={`${isMobileMenuOpen ? "hidden" : "block"} h-6 w-6`}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -124,7 +95,7 @@ function Navbar() {
               </svg>
               {/* X icon */}
               <svg
-                className={`${isMobileMenuOpen ? 'block' : 'hidden'} h-6 w-6`}
+                className={`${isMobileMenuOpen ? "block" : "hidden"} h-6 w-6`}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -142,9 +113,9 @@ function Navbar() {
           </div>
         </div>
       </div>
-      
+
       {/* Mobile menu */}
-      <div className={`${isMobileMenuOpen ? 'block' : 'hidden'} sm:hidden`}>
+      <div className={`${isMobileMenuOpen ? "block" : "hidden"} sm:hidden`}>
         <div className="pt-2 pb-3 space-y-1">
           <Link
             to="/dashboard"
@@ -157,8 +128,8 @@ function Navbar() {
           >
             Dashboard
           </Link>
-          
-          <Link
+
+          {/* <Link
             to="/projects"
             onClick={() => setIsMobileMenuOpen(false)}
             className={`block px-3 py-2 rounded-md text-base font-medium ${
@@ -168,8 +139,8 @@ function Navbar() {
             }`}
           >
             Projects
-          </Link>
-          
+          </Link> */}
+
           {isAdmin && (
             <Link
               to="/admin"
@@ -184,7 +155,7 @@ function Navbar() {
             </Link>
           )}
         </div>
-        
+
         {/* Mobile user info */}
         <div className="pt-4 pb-3 border-t border-gray-200">
           <div className="flex items-center px-4">
@@ -196,7 +167,9 @@ function Navbar() {
               </div>
             </div>
             <div className="ml-3">
-              <div className="text-base font-medium text-gray-800">{userName}</div>
+              <div className="text-base font-medium text-gray-800">
+                {userName}
+              </div>
             </div>
             <button
               onClick={handleLogout}
@@ -204,18 +177,18 @@ function Navbar() {
             >
               <span className="sr-only">Logout</span>
               {/* Logout icon */}
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="h-6 w-6" 
-                fill="none" 
-                viewBox="0 0 24 24" 
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
                 stroke="currentColor"
               >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" 
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                 />
               </svg>
             </button>
