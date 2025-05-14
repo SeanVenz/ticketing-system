@@ -1,13 +1,7 @@
 import React from "react";
 
 function StatusFilterTab({ statusFilter, setStatusFilter, openTicketsCount, inProgressTicketsCount, forReviewTicketsCount, closedTicketsCount }) {
-  console.log('StatusFilterTab received counts:', {
-    open: openTicketsCount,
-    inProgress: inProgressTicketsCount,
-    forReview: forReviewTicketsCount,
-    closed: closedTicketsCount
-  });
-  
+ 
   return (
     <div className="mb-6">
       <div className="border-b border-gray-200">
