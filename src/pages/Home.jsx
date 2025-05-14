@@ -10,7 +10,7 @@ function Home() {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-600 to-blue-800 pt-24 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-1 gap-12 items-center">
             <div className="text-center lg:text-left">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
                 Lorem Ipsum <span className="text-yellow-300">Dolor Sit Amet</span>
@@ -32,13 +32,6 @@ function Home() {
                   Dolor Sit
                 </Link>
               </div>
-            </div>
-            <div className="hidden lg:block">
-              <img
-                src={"https://cdn.pixabay.com/photo/2020/01/21/17/17/project-4783375_1280.png"}
-                alt="Lorem Ipsum"
-                className="w-full h-auto rounded-lg shadow-2xl"
-              />
             </div>
           </div>
         </div>
