@@ -10,6 +10,7 @@ function Navbar() {
   const isActive = (path) => location.pathname === path;
   const userName = localStorage.getItem("userName") || "User";
   const isAdmin = localStorage.getItem("isAdmin") === "true";
+  const isLoggedIn = localStorage.getItem("userId") !== null;
 
   const handleLogout = () => {
     // Clear local storage
@@ -19,7 +20,10 @@ function Navbar() {
     localStorage.removeItem("isAdmin");
 
     // Redirect to login
-    navigate("/login");
+    navigate("/");
+    
+    // Close mobile menu if open
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -29,45 +33,74 @@ function Navbar() {
           {/* Logo and Desktop Navigation */}
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <span className="text-xl font-bold ml-2 text-gray-800">
+              <a href="/" className="text-xl font-bold ml-2 text-gray-800">
                 TicketApp
-              </span>
+              </a>
             </div>
 
             {/* Desktop Navigation Links */}
-            <div className="hidden sm:ml-6 sm:flex sm:items-center">
-              <Link
-                to="/dashboard"
-                className={`px-3 py-2 rounded-md text-sm font-medium ${
-                  isActive("/dashboard") || isActive("/admin")
-                    ? "text-blue-600"
-                    : "text-gray-500 hover:text-blue-600 hover:bg-gray-50"
-                }`}
-              >
-                Dashboard
-              </Link>
-            </div>
+            {isLoggedIn ? (
+              <>
+                <div className="hidden sm:ml-6 sm:flex sm:items-center">
+                  <Link
+                    to={`${isAdmin ? '/admin' : '/dashboard'}`}
+                    className={`px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive("/dashboard") || isActive("/admin")
+                        ? "text-blue-600"
+                        : "text-gray-500 hover:text-blue-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    Dashboard
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <></>
+            )}
           </div>
 
           {/* User Account Menu */}
-          <div className="hidden sm:ml-6 sm:flex sm:items-center">
-            <div className="ml-3 relative">
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-600">Hello, {userName}</span>
-                <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                  <span className="text-sm font-medium text-blue-800">
-                    {userName.charAt(0).toUpperCase()}
-                  </span>
+          {isLoggedIn ? (
+            <>
+              <div className="hidden sm:ml-6 sm:flex sm:items-center">
+                <div className="ml-3 relative">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-gray-600">
+                      Hello, {userName}
+                    </span>
+                    <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                      <span className="text-sm font-medium text-blue-800">
+                        {userName.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="text-sm cursor-pointer text-gray-500 hover:text-red-500"
+                    >
+                      Logout
+                    </button>
+                  </div>
                 </div>
-                <button
-                  onClick={handleLogout}
-                  className="text-sm cursor-pointer text-gray-500 hover:text-red-500"
-                >
-                  Logout
-                </button>
               </div>
-            </div>
-          </div>
+            </>
+          ) : (
+            <>
+              <div className="hidden sm:ml-6 sm:flex sm:items-center gap-4">
+                <Link
+                  to="/login"
+                  className="text-sm cursor-pointer text-gray-600 hover:text-blue-600 font-medium"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="text-sm px-4 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
+                >
+                  Register
+                </Link>
+              </div>
+            </>
+          )}
 
           {/* Mobile menu button */}
           <div className="flex items-center sm:hidden">
@@ -98,7 +131,7 @@ function Navbar() {
                 className={`${isMobileMenuOpen ? "block" : "hidden"} h-6 w-6`}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
-                viewBox="0 0 24 24"
+                viewBox="0 24 24"
                 stroke="currentColor"
                 aria-hidden="true"
               >
@@ -114,86 +147,106 @@ function Navbar() {
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu with conditional content */}
       <div className={`${isMobileMenuOpen ? "block" : "hidden"} sm:hidden`}>
-        <div className="pt-2 pb-3 space-y-1">
-          <Link
-            to="/dashboard"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className={`block px-3 py-2 rounded-md text-base font-medium ${
-              isActive("/dashboard")
-                ? "bg-blue-50 text-blue-600"
-                : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"
-            }`}
-          >
-            Dashboard
-          </Link>
-
-          {/* <Link
-            to="/projects"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className={`block px-3 py-2 rounded-md text-base font-medium ${
-              isActive("/projects")
-                ? "bg-blue-50 text-blue-600"
-                : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"
-            }`}
-          >
-            Projects
-          </Link> */}
-
-          {isAdmin && (
-            <Link
-              to="/admin"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={`block px-3 py-2 rounded-md text-base font-medium ${
-                isActive("/admin")
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"
-              }`}
-            >
-              Admin
-            </Link>
-          )}
-        </div>
-
-        {/* Mobile user info */}
-        <div className="pt-4 pb-3 border-t border-gray-200">
-          <div className="flex items-center px-4">
-            <div className="flex-shrink-0">
-              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                <span className="text-sm font-medium text-blue-800">
-                  {userName.charAt(0).toUpperCase()}
-                </span>
-              </div>
-            </div>
-            <div className="ml-3">
-              <div className="text-base font-medium text-gray-800">
-                {userName}
-              </div>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="ml-auto flex-shrink-0 bg-white p-1 text-gray-400 hover:text-red-500"
-            >
-              <span className="sr-only">Logout</span>
-              {/* Logout icon */}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+        {isLoggedIn ? (
+          <>
+            {/* Mobile navigation for logged-in users */}
+            <div className="pt-2 pb-3 space-y-1">
+              <Link
+                to="/dashboard"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`block px-3 py-2 rounded-md text-base font-medium ${
+                  isActive("/dashboard")
+                    ? "bg-blue-50 text-blue-600"
+                    : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"
+                }`}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
+                Dashboard
+              </Link>
+
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block px-3 py-2 rounded-md text-base font-medium ${
+                    isActive("/admin")
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"
+                  }`}
+                >
+                  Admin
+                </Link>
+              )}
+            </div>
+
+            {/* Mobile user info */}
+            <div className="pt-4 pb-3 border-t border-gray-200">
+              <div className="flex items-center px-4">
+                <div className="flex-shrink-0">
+                  <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                    <span className="text-sm font-medium text-blue-800">
+                      {userName.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+                <div className="ml-3">
+                  <div className="text-base font-medium text-gray-800">
+                    {userName}
+                  </div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="ml-auto flex-shrink-0 bg-white p-1 text-gray-400 hover:text-red-500"
+                >
+                  <span className="sr-only">Logout</span>
+                  {/* Logout icon */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Mobile auth options for logged-out users */}
+            <div className="pt-2 pb-3 space-y-1 border-t border-gray-200">
+              <Link
+                to="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-50 hover:text-blue-600"
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-50 hover:text-blue-600"
+              >
+                Register
+              </Link>
+              <Link
+                to="/"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-50 hover:text-blue-600"
+              >
+                Home
+              </Link>
+            </div>
+          </>
+        )}
       </div>
     </nav>
   );
