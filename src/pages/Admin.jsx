@@ -8,6 +8,7 @@ import { getFilteredTickets, ticketCount } from "../utils/utils";
 import StatusFilterTab from "../components/StatusFilterTab";
 import TicketHeader from "../components/TicketHeader";
 import TicketParagraph from "../components/TicketParagraph";
+import StatisticsSummary from "../components/StatisticsSummary";
 
 function Admin() {
   const {
@@ -31,23 +32,6 @@ function Admin() {
     };
     getUserNum();
   }, []);
-
-  // Add this useEffect for debugging
-  // useEffect(() => {
-  //   // Check if tickets are loaded
-  //   if (tickets && tickets.length > 0) {
-  //     // Log all unique statuses
-  //     const uniqueStatuses = [...new Set(tickets.map(t => t.status))];
-  //     console.log("All unique status values:", uniqueStatuses);
-
-  //     // Check specifically for For Review tickets
-  //     const forReviewTickets = tickets.filter(t => t.status === "For Review");
-  //     console.log("For Review tickets:", forReviewTickets);
-
-  //     // Check if forReviewTicketsCount is calculated correctly
-  //     console.log("For Review count:", forReviewTicketsCount);
-  //   }
-  // }, [tickets, forReviewTicketsCount]);
 
   const handleTicketUpdate = () => {
     if (refetch) {
@@ -76,41 +60,15 @@ function Admin() {
         <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
 
         {/* Statistics Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-blue-100 p-4 rounded-lg shadow">
-            <h2 className="text-lg font-semibold text-blue-800">
-              Total Tickets
-            </h2>
-            <p className="text-2xl font-bold text-blue-600">
-              {tickets?.length || 0}
-            </p>
-          </div>
-
-          <div className="bg-green-100 p-4 rounded-lg shadow">
-            <h2 className="text-lg font-semibold text-green-800">
-              Open Tickets
-            </h2>
-            <p className="text-2xl font-bold text-green-600">
-              {openTicketsCount}
-            </p>
-          </div>
-
-          <div className="bg-yellow-100 p-4 rounded-lg shadow">
-            <h2 className="text-lg font-semibold text-yellow-800">
-              In Progress
-            </h2>
-            <p className="text-2xl font-bold text-yellow-600">
-              {inProgressTicketsCount}
-            </p>
-          </div>
-
-          <div className="bg-purple-100 p-4 rounded-lg shadow">
-            <h2 className="text-lg font-semibold text-purple-800">
-              Active Users
-            </h2>
-            <p className="text-2xl font-bold text-purple-600">{userNumber}</p>
-          </div>
-        </div>
+        <StatisticsSummary
+          tickets={tickets}
+          openTicketsCount={openTicketsCount}
+          inProgressTicketsCount={inProgressTicketsCount}
+          forReviewTicketsCount={forReviewTicketsCount}
+          closedTicketsCount={closedTicketsCount}
+          userNumber={userNumber}
+          isAdmin={true}
+        />
 
         {/* Status Filter Tabs */}
 
@@ -125,13 +83,13 @@ function Admin() {
 
         {/* All Tickets with TicketCard Component */}
         <div className="mb-8">
-          <TicketHeader statusFilter={statusFilter}/>
+          <TicketHeader statusFilter={statusFilter} />
           {loading ? (
             <p className="text-gray-500">Loading tickets...</p>
           ) : error ? (
             <p className="text-red-500">Error: {error}</p>
           ) : filteredTickets.length === 0 ? (
-            <TicketParagraph statusFilter={statusFilter}/>
+            <TicketParagraph statusFilter={statusFilter} />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredTickets.map((ticket) => (

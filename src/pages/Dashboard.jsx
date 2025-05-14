@@ -9,6 +9,7 @@ import StatusFilterTab from "../components/StatusFilterTab";
 import AddTicket from "../components/AddTicket";
 import TicketHeader from "../components/TicketHeader";
 import TicketParagraph from "../components/TicketParagraph";
+import StatisticsSummary from "../components/StatisticsSummary";
 
 function Dashboard() {
   const [isAddTicketModalOpen, setIsAddTicketModalOpen] = useState(false);
@@ -27,7 +28,7 @@ function Dashboard() {
 
   const handleTicketAdded = () => {
     setIsAddTicketModalOpen(false);
-    
+
     // Refresh the tickets list
     if (refetch) {
       refetch();
@@ -69,36 +70,14 @@ function Dashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <div className="bg-blue-100 p-4 rounded-lg shadow">
-            <h3 className="text-lg font-medium text-blue-800 mb-2">
-              Total Tickets
-            </h3>
-            <p className="text-2xl font-bold text-blue-900">
-              {tickets?.length || 0}
-            </p>
-          </div>
-
-          <div className="bg-green-100 p-4 rounded-lg shadow">
-            <h3 className="text-lg font-medium text-green-800 mb-2">
-              Open Tickets
-            </h3>
-            <p className="text-2xl font-bold text-green-900">
-              {tickets?.filter((ticket) => ticket.status === "Open").length ||
-                0}
-            </p>
-          </div>
-
-          <div className="bg-purple-100 p-4 rounded-lg shadow">
-            <h3 className="text-lg font-medium text-purple-800 mb-2">
-              In Progress
-            </h3>
-            <p className="text-2xl font-bold text-purple-900">
-              {tickets?.filter((ticket) => ticket.status === "In Progress")
-                .length || 0}
-            </p>
-          </div>
-        </div>
+        <StatisticsSummary
+          tickets={tickets}
+          openTicketsCount={openTicketsCount}
+          inProgressTicketsCount={inProgressTicketsCount}
+          forReviewTicketsCount={forReviewTicketsCount}
+          closedTicketsCount={closedTicketsCount}
+          isAdmin={false}
+        />
 
         {/* Status Filter Tabs */}
         <StatusFilterTab
@@ -112,14 +91,14 @@ function Dashboard() {
 
         {/* Tickets List */}
         <div className="mb-8">
-          <TicketHeader statusFilter={statusFilter}/>
+          <TicketHeader statusFilter={statusFilter} />
           {loading ? (
             <p className="text-gray-500">Loading tickets...</p>
           ) : error ? (
             <p className="text-red-500">Error: {error}</p>
           ) : filteredTickets.length === 0 ? (
             <div className="text-center py-8">
-              <TicketParagraph statusFilter={statusFilter}/>
+              <TicketParagraph statusFilter={statusFilter} />
               <Button onClick={() => setIsAddTicketModalOpen(true)}>
                 Create Your First Ticket
               </Button>
