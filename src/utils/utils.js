@@ -59,8 +59,5 @@ export const getFilteredTickets = (tickets, statusFilter) => {
 
 export const ticketCount = (tickets, status) => {
     if (!tickets) return 0;
-    if(status === "For Review"){
-        console.log('here')
-    }
     return tickets?.filter(ticket => ticket.status === status).length || 0;
 }
